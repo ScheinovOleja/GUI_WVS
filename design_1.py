@@ -1,11 +1,14 @@
 import sys
 import os
+from argparse import Namespace
+
 from PyQt5.Qt import *
 from random import randint
 import numpy as np  # Для вычислений
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas  # Область для черчения
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar  # Панель управления
 from matplotlib.figure import Figure  # Фигура для черчений
+from plots import Plots
 
 
 class PlotWidget(QWidget):
@@ -15,9 +18,12 @@ class PlotWidget(QWidget):
         2: np.cos,
     }
 
-    def __init__(self):
+    def __init__(self, current_file):
         super(PlotWidget, self).__init__()  # Инициализируем экземпляр
 
+        self.arguments = Namespace(input='data//IIS3DWB//' + current_file.currentText(), savefig=False, print=True,
+                                   name='', fmin=None, fmax=None, ylog=False)
+        self.plots = Plots(arguments=self.arguments)
         self.main_layout = QVBoxLayout(self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
@@ -98,7 +104,9 @@ class MainWindow(QMainWindow):
         self.vertical_layout = QVBoxLayout()
         self.vertical_layout.setObjectName("verticalLayout")
 
-        self.widget = PlotWidget()
+        self.add_item_to_combo_box()
+
+        self.widget = PlotWidget(current_file=self.combo_box)
         self.widget.setObjectName("widget")
 
         self.vertical_layout.addWidget(self.label)
@@ -109,7 +117,7 @@ class MainWindow(QMainWindow):
         self.vertical_layout_2 = QVBoxLayout()
         self.vertical_layout_2.setObjectName("verticalLayout_2")
 
-        self.widget_2 = PlotWidget()
+        self.widget_2 = PlotWidget(current_file=self.combo_box)
         self.widget_2.setObjectName("widget_2")
 
         self.vertical_layout_2.addWidget(self.label_2)
@@ -120,7 +128,7 @@ class MainWindow(QMainWindow):
         self.vertical_layout_3 = QVBoxLayout()
         self.vertical_layout_3.setObjectName("verticalLayout_3")
 
-        self.widget_3 = PlotWidget()
+        self.widget_3 = PlotWidget(current_file=self.combo_box)
         self.widget_3.setObjectName("widget_3")
 
         self.vertical_layout_3.addWidget(self.label_3)
@@ -131,7 +139,7 @@ class MainWindow(QMainWindow):
         self.vertica_layout_4 = QVBoxLayout()
         self.vertica_layout_4.setObjectName("verticalLayout_4")
 
-        self.widget_4 = PlotWidget()
+        self.widget_4 = PlotWidget(current_file=self.combo_box)
         self.widget_4.setObjectName("widget_4")
 
         self.vertica_layout_4.addWidget(self.label_4)
@@ -151,7 +159,6 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.status_bar)
 
         self.translate_ui()
-        self.add_item_to_combo_box()
         self.connect_ui()
 
     def add_item_to_combo_box(self):
