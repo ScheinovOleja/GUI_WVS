@@ -198,7 +198,7 @@ class Plots:
         plt.tight_layout()
         plt.subplots_adjust(hspace=0)
 
-        return plt
+        return f
         #if self.save_fig:
         #    plt.savefig(f'{label}-fft.png')
         #if self.show_fig:
@@ -279,7 +279,8 @@ class Plots:
 
         #if self.show_fig:
         #    plt.show(block=False)
-        return plt
+
+        return fig
 
     def run(self, view):
         if self.args.name == '':  # Fill measurement name to show on plots
@@ -291,18 +292,18 @@ class Plots:
 
         raw = self.parse_accel_raw()
         if view == 'raw':
-            #self.file_name = arguments.input.replace('fft.log', 'raw.log')
-            plt = self.plot_accel_raw(raw, subtitle=self.args.name)
-            return plt
+            fig = self.plot_accel_raw(raw, subtitle=self.args.name)
+            return fig
         else:
+            print("имя файла ", self.file_name)
             fft_embed = self.parse_accel_fft()  # parse file spectra
             if view == 'fft_spectra':
-                plt = self.plot_fft_xyz(fft_embed['spectrum_x'],  # plot spectra
+                fig = self.plot_fft_xyz(fft_embed['spectrum_x'],  # plot spectra
                                     fft_embed['spectrum_y'],
                                     fft_embed['spectrum_z'],
                                     label=f'{self.args.name}-embed',
                                     f_min=self.args.fmin, f_max=self.args.fmax, )
-                return plt
+                return fig
             if view == 'Fourier_spectra':
                 # calculate Fourier spectra
                 spectrum_x = self.calculate_fft(raw['data'][:, 0], raw['frequency'], remove_dc=False, norm_amplitude=True,
@@ -320,12 +321,12 @@ class Plots:
 
                 #plot calculated Fourier spectra
                 print('Calculated spectra peaks:')
-                plt = self.plot_fft_xyz(spectrum_x,
+                fig = self.plot_fft_xyz(spectrum_x,
                                 spectrum_y,
                                 spectrum_z,
                                 label=f'{self.args.name}-calculated',
                                 f_min=self.args.fmin, f_max=self.args.fmax, )
-                return plt
+                return fig
         #if self.args.print:
             #plt.show()
         #return plt
@@ -333,16 +334,20 @@ class Plots:
 if __name__ == "__main__":
     #  В комментах args для тестирования, чтобы вечно не использовать командную строку
     # args = parser.parse_args()
-    args = argparse.Namespace(input='data//IIS3DWB//2021-03-08-19-05-51-accel_raw.log',
+    args = argparse.Namespace(input='data//IIS3DWB//2021-03-08-19-05-51-accel_fft.log',
                                savefig=False,
                                print=True,
                                name='',
                                fmin=None,
                                fmax=None,
                                ylog=True)
+    #plot = Plots(arguments=args, boolraw='true')
     plot = Plots(arguments=args, boolraw='true')
-    view = 'raw'
+    #view = 'raw'
     #view = 'fft_spectra'
-    #view = 'Fourier_spectra'
-    plt = plot.run(view)
-    plt.show()
+    view = 'Fourier_spectra'
+    ##plot.run(view).show()
+    #fig = plot.run(view).show()
+    fig = plot.run(view)
+    print("type fig", type(fig))
+    #plt.show()

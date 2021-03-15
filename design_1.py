@@ -9,6 +9,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar  # Панель управления
 from matplotlib.figure import Figure  # Фигура для черчений
 from plots import Plots
+import matplotlib.pyplot as plt
 
 
 class PlotWidget(QWidget):
@@ -18,60 +19,30 @@ class PlotWidget(QWidget):
         2: np.cos,
     }
 
-    def __init__(self, current_file):
+    def __init__(self, current_file, type):
         super(PlotWidget, self).__init__()  # Инициализируем экземпляр
 
         #self.arguments = Namespace(input='data//IIS3DWB//' + current_file.currentText(), savefig=False, print=True,
-        #                           name='', fmin=None, fmax=None, ylog=False)
-        self.arguments = Namespace(input='data//IIS3DWB//2021-03-08-19-05-51-accel_raw.log', savefig=False, print=True, name = '', fmin = None, fmax = None, ylog = False)
+        #                           name='', fmin=None, fmax=None, ylog=True)
+        #self.arguments = Namespace(input='data//IIS3DWB//2021-03-08-19-05-51-accel_raw.log', savefig=False, print=True, name = '', fmin = None, fmax = None, ylog = True)
+        self.arguments = Namespace(input=current_file, savefig=False, print=True,
+                                   name='', fmin=None, fmax=None, ylog=True)
         self.plots = Plots(arguments=self.arguments, boolraw='True')
         self.main_layout = QVBoxLayout(self)
-        self.figure = Figure()
+        #self.figure = Figure()
+        #self.figure = self.plots.run('raw')
+        self.figure = self.plots.run(type)
         self.canvas = FigureCanvas(self.figure)
         self.nav_tool_bar = NavigationToolbar(self.canvas, self)
         self.main_layout.addWidget(self.canvas)
         self.main_layout.addWidget(self.nav_tool_bar)
 
     def plot(self):
-        # function = self.functions[randint(1, 2)]
-        #
-        # x = np.linspace(-10, 10, 2000)
-        #
-        # y = function(x)
-        #
-        # self.figure.clear()
-        # ax = self.figure.add_subplot(111)
-        # ax.set_facecolor('#DCDCDC')
-        #
-        # ax.axhline(y=0, xmin=-10.25, xmax=10.25, color='#000000')
-        # ax.axvline(x=0, ymin=-2, ymax=2, color='#000000')
-        #
-        # ax.set_ylim([-2, 2])
-        # ax.set_xlim([-10.25, 10.25])
-        #
-        # if function == np.sin or function == np.cos:
-        #     ax.axhline(y=1, xmin=-10.25, xmax=10.25, color='b', linestyle='--')
-        #     ax.axhline(y=-1, xmin=-10.25, xmax=10.25, color='b', linestyle='--')
-        #
-        # ax.plot(x, y, linestyle='-.', color='#008000', label=function.__name__)
-        # ax.legend(loc='upper right')
-        # self.canvas.draw()
-        args = argparse.Namespace(input='data//IIS3DWB//2021-03-08-19-05-51-accel_raw.log',
-                                  savefig=False,
-                                  print=True,
-                                  name='',
-                                  fmin=None,
-                                  fmax=None,
-                                  ylog=True)
-        plot = Plots(arguments=args, boolraw='true')
-        view = 'raw'
-        # view = 'fft_spectra'
-        # view = 'Fourier_spectra'
-        self.figure.clear()
-        plt = plot.run(view)
-        plt.plot()
-        self.canvas.draw()
 
+        #self.figure.clear()
+        self.figure = self.plots.run('raw')
+        self.canvas = FigureCanvas(self.figure)
+        self.canvas.draw()
 
 class MainWindow(QMainWindow):
 
@@ -122,7 +93,8 @@ class MainWindow(QMainWindow):
 
         self.add_item_to_combo_box()
 
-        self.widget = PlotWidget(current_file=self.combo_box)
+        #self.widget = PlotWidget(current_file=self.combo_box)
+        self.widget = PlotWidget(current_file='data//IIS3DWB//2021-03-08-19-05-51-accel_raw.log', type='raw')
         self.widget.setObjectName("widget")
 
         self.vertical_layout.addWidget(self.label)
@@ -133,7 +105,8 @@ class MainWindow(QMainWindow):
         self.vertical_layout_2 = QVBoxLayout()
         self.vertical_layout_2.setObjectName("verticalLayout_2")
 
-        self.widget_2 = PlotWidget(current_file=self.combo_box)
+        #self.widget_2 = PlotWidget(current_file=self.combo_box)
+        self.widget_2 = PlotWidget(current_file='data//IIS3DWB//2021-03-08-19-05-51-accel_fft.log', type='fft_spectra')
         self.widget_2.setObjectName("widget_2")
 
         self.vertical_layout_2.addWidget(self.label_2)
@@ -144,7 +117,8 @@ class MainWindow(QMainWindow):
         self.vertical_layout_3 = QVBoxLayout()
         self.vertical_layout_3.setObjectName("verticalLayout_3")
 
-        self.widget_3 = PlotWidget(current_file=self.combo_box)
+        #self.widget_3 = PlotWidget(current_file=self.combo_box)
+        self.widget_3 = PlotWidget(current_file='data//IIS3DWB//2021-03-08-19-05-51-accel_fft.log', type='Fourier_spectra')
         self.widget_3.setObjectName("widget_3")
 
         self.vertical_layout_3.addWidget(self.label_3)
@@ -152,16 +126,19 @@ class MainWindow(QMainWindow):
 
         self.grid_layout.addLayout(self.vertical_layout_3, 3, 0, 1, 1)
 
-        self.vertica_layout_4 = QVBoxLayout()
-        self.vertica_layout_4.setObjectName("verticalLayout_4")
-
-        self.widget_4 = PlotWidget(current_file=self.combo_box)
-        self.widget_4.setObjectName("widget_4")
-
-        self.vertica_layout_4.addWidget(self.label_4)
-        self.vertica_layout_4.addWidget(self.widget_4)
-
-        self.grid_layout.addLayout(self.vertica_layout_4, 3, 1, 1, 1)
+        # self.vertica_layout_4 = QLCDNumber()
+        # self.vertica_layout_4.setObjectName("verticalLayout_4")
+        #
+        # #self.widget_4 = PlotWidget(current_file=self.combo_box)
+        # self.widget_4 = PlotWidget(current_file='',type='')
+        #self.widget_4.setObjectName("widget_4")
+        #
+        # self.vertica_layout_4.value = '5.000'
+        # self.vertica_layout_4.
+        # self.vertica_layout_4.addWidget(self.label_4)
+        #self.vertica_layout_4.addWidget(self.widget_4)
+        #
+        # self.grid_layout.addLayout(self.vertica_layout_4, 3, 1, 1, 1)
 
         self.setCentralWidget(self.central_widget)
 
@@ -190,14 +167,15 @@ class MainWindow(QMainWindow):
         self.label.setText(_translate("MainWindow", "Спектр сигнала"))
         self.label_2.setText(_translate("MainWindow", "Спектр огибающей"))
         self.label_3.setText(_translate("MainWindow", "Полный спектр"))
-        self.label_4.setText(_translate("MainWindow", "Сигнал с представлением"))
+        #self.label_4.setText(_translate("MainWindow", "Сигнал с представлением"))
+        self.label_4.setText(_translate("MainWindow", "Батарея"))
         self.update.setText(_translate("MainWindow", "Update"))
 
     def connect_ui(self):
         self.update.clicked.connect(self.widget.plot)
         self.update.clicked.connect(self.widget_2.plot)
         self.update.clicked.connect(self.widget_3.plot)
-        self.update.clicked.connect(self.widget_4.plot)
+        #self.update.clicked.connect(self.widget_4.plot)
 
     def clear(self):
         self.widget.figure.clear()
