@@ -1,7 +1,7 @@
 import sys
 import os
 from argparse import Namespace
-
+import argparse
 from PyQt5.Qt import *
 from random import randint
 import numpy as np  # Для вычислений
@@ -21,9 +21,10 @@ class PlotWidget(QWidget):
     def __init__(self, current_file):
         super(PlotWidget, self).__init__()  # Инициализируем экземпляр
 
-        self.arguments = Namespace(input='data//IIS3DWB//' + current_file.currentText(), savefig=False, print=True,
-                                   name='', fmin=None, fmax=None, ylog=False)
-        self.plots = Plots(arguments=self.arguments)
+        #self.arguments = Namespace(input='data//IIS3DWB//' + current_file.currentText(), savefig=False, print=True,
+        #                           name='', fmin=None, fmax=None, ylog=False)
+        self.arguments = Namespace(input='data//IIS3DWB//2021-03-08-19-05-51-accel_raw.log', savefig=False, print=True, name = '', fmin = None, fmax = None, ylog = False)
+        self.plots = Plots(arguments=self.arguments, boolraw='True')
         self.main_layout = QVBoxLayout(self)
         self.figure = Figure()
         self.canvas = FigureCanvas(self.figure)
@@ -32,28 +33,43 @@ class PlotWidget(QWidget):
         self.main_layout.addWidget(self.nav_tool_bar)
 
     def plot(self):
-        function = self.functions[randint(1, 2)]
-
-        x = np.linspace(-10, 10, 2000)
-
-        y = function(x)
-
+        # function = self.functions[randint(1, 2)]
+        #
+        # x = np.linspace(-10, 10, 2000)
+        #
+        # y = function(x)
+        #
+        # self.figure.clear()
+        # ax = self.figure.add_subplot(111)
+        # ax.set_facecolor('#DCDCDC')
+        #
+        # ax.axhline(y=0, xmin=-10.25, xmax=10.25, color='#000000')
+        # ax.axvline(x=0, ymin=-2, ymax=2, color='#000000')
+        #
+        # ax.set_ylim([-2, 2])
+        # ax.set_xlim([-10.25, 10.25])
+        #
+        # if function == np.sin or function == np.cos:
+        #     ax.axhline(y=1, xmin=-10.25, xmax=10.25, color='b', linestyle='--')
+        #     ax.axhline(y=-1, xmin=-10.25, xmax=10.25, color='b', linestyle='--')
+        #
+        # ax.plot(x, y, linestyle='-.', color='#008000', label=function.__name__)
+        # ax.legend(loc='upper right')
+        # self.canvas.draw()
+        args = argparse.Namespace(input='data//IIS3DWB//2021-03-08-19-05-51-accel_raw.log',
+                                  savefig=False,
+                                  print=True,
+                                  name='',
+                                  fmin=None,
+                                  fmax=None,
+                                  ylog=True)
+        plot = Plots(arguments=args, boolraw='true')
+        view = 'raw'
+        # view = 'fft_spectra'
+        # view = 'Fourier_spectra'
         self.figure.clear()
-        ax = self.figure.add_subplot(111)
-        ax.set_facecolor('#DCDCDC')
-
-        ax.axhline(y=0, xmin=-10.25, xmax=10.25, color='#000000')
-        ax.axvline(x=0, ymin=-2, ymax=2, color='#000000')
-
-        ax.set_ylim([-2, 2])
-        ax.set_xlim([-10.25, 10.25])
-
-        if function == np.sin or function == np.cos:
-            ax.axhline(y=1, xmin=-10.25, xmax=10.25, color='b', linestyle='--')
-            ax.axhline(y=-1, xmin=-10.25, xmax=10.25, color='b', linestyle='--')
-
-        ax.plot(x, y, linestyle='-.', color='#008000', label=function.__name__)
-        ax.legend(loc='upper right')
+        plt = plot.run(view)
+        plt.plot()
         self.canvas.draw()
 
 
