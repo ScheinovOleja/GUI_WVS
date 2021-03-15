@@ -9,6 +9,7 @@ from scipy import signal
 import argparse
 import os
 
+
 # parser = argparse.ArgumentParser()
 # parser.add_argument("-i", "--input", type=str, help="input accel_raw file", required=True)
 # # parser.add_argument("-f", "--freq", type=float, help="data frequency", default=100000)
@@ -194,14 +195,15 @@ class Plots:
             y_min *= 0.01
         # plt.ylim([Ymin, Ymax])
 
-        #ax[0].set_title('Fourier spectra for 3 axes\n' + label)
+        # ax[0].set_title('Fourier spectra for 3 axes\n' + label)
         plt.tight_layout()
         plt.subplots_adjust(hspace=0)
 
+        # if self.save_fig:
         return f
-        #if self.save_fig:
+        # if self.save_fig:
         #    plt.savefig(f'{label}-fft.png')
-        #if self.show_fig:
+        # if self.show_fig:
         #    plt.show(block=False)
 
     def plot_accel_raw(self, raw, subtitle='', align_y_scale=True):
@@ -248,7 +250,7 @@ class Plots:
             for a in (ax[i, 1], ax[i, 2]):
                 a.margins(0, None)
 
-        #ax[0, 1].set_title(raw['description'] + ' ' + f"{subtitle}")
+        # ax[0, 1].set_title(raw['description'] + ' ' + f"{subtitle}")
         ax[-1, 1].set_xlabel('time, s')
 
         # Join axes for zooming
@@ -274,10 +276,10 @@ class Plots:
 
         plt.subplots_adjust(wspace=0.0, hspace=0.05)
 
-        #if self.save_fig:
+        # if self.save_fig:
         #    plt.savefig(f'{subtitle}-waveform.png', dpi=300)
 
-        #if self.show_fig:
+        # if self.show_fig:
         #    plt.show(block=False)
 
         return fig
@@ -294,60 +296,64 @@ class Plots:
         if view == 'raw':
             fig = self.plot_accel_raw(raw, subtitle=self.args.name)
             return fig
-        else:
+        elif view == 'fft_spectra':
             print("имя файла ", self.file_name)
-            fft_embed = self.parse_accel_fft()  # parse file spectra
-            if view == 'fft_spectra':
-                fig = self.plot_fft_xyz(fft_embed['spectrum_x'],  # plot spectra
+            fft_embed = self.parse_accel_fft()
+            fig = self.plot_fft_xyz(fft_embed['spectrum_x'],  # plot spectra
                                     fft_embed['spectrum_y'],
                                     fft_embed['spectrum_z'],
                                     label=f'{self.args.name}-embed',
                                     f_min=self.args.fmin, f_max=self.args.fmax, )
-                return fig
-            if view == 'Fourier_spectra':
-                # calculate Fourier spectra
-                spectrum_x = self.calculate_fft(raw['data'][:, 0], raw['frequency'], remove_dc=False, norm_amplitude=True,
-                                                window='hann',
-                                                decim_factor=1)
-                print(spectrum_x)
-                spectrum_y = self.calculate_fft(raw['data'][:, 1], raw['frequency'], remove_dc=False, norm_amplitude=True,
-                                                window='hann',
-                                                decim_factor=1)
-                print(spectrum_y)
-                spectrum_z = self.calculate_fft(raw['data'][:, 2], raw['frequency'], remove_dc=False, norm_amplitude=True,
-                                                window='hann',
-                                                decim_factor=1)
-                print(spectrum_z)
+            return fig
+        elif view == 'Fourier_spectra':
+            print("имя файла ", self.file_name)
+            # calculate Fourier spectra
+            spectrum_x = self.calculate_fft(raw['data'][:, 0], raw['frequency'], remove_dc=False,
+                                            norm_amplitude=True,
+                                            window='hann',
+                                            decim_factor=1)
+            print(spectrum_x)
+            spectrum_y = self.calculate_fft(raw['data'][:, 1], raw['frequency'], remove_dc=False,
+                                            norm_amplitude=True,
+                                            window='hann',
+                                            decim_factor=1)
+            print(spectrum_y)
+            spectrum_z = self.calculate_fft(raw['data'][:, 2], raw['frequency'], remove_dc=False,
+                                            norm_amplitude=True,
+                                            window='hann',
+                                            decim_factor=1)
+            print(spectrum_z)
 
-                #plot calculated Fourier spectra
-                print('Calculated spectra peaks:')
-                fig = self.plot_fft_xyz(spectrum_x,
-                                spectrum_y,
-                                spectrum_z,
-                                label=f'{self.args.name}-calculated',
-                                f_min=self.args.fmin, f_max=self.args.fmax, )
-                return fig
-        #if self.args.print:
-            #plt.show()
-        #return plt
+            # plot calculated Fourier spectra
+            print('Calculated spectra peaks:')
+            fig = self.plot_fft_xyz(spectrum_x,
+                                    spectrum_y,
+                                    spectrum_z,
+                                    label=f'{self.args.name}-calculated',
+                                    f_min=self.args.fmin, f_max=self.args.fmax, )
+            return fig
+        # if self.args.print:
+        # plt.show()
+        # return plt
+
 
 if __name__ == "__main__":
     #  В комментах args для тестирования, чтобы вечно не использовать командную строку
     # args = parser.parse_args()
     args = argparse.Namespace(input='data//IIS3DWB//2021-03-08-19-05-51-accel_fft.log',
-                               savefig=False,
-                               print=True,
-                               name='',
-                               fmin=None,
-                               fmax=None,
-                               ylog=True)
-    #plot = Plots(arguments=args, boolraw='true')
+                              savefig=False,
+                              print=True,
+                              name='',
+                              fmin=None,
+                              fmax=None,
+                              ylog=True)
+    # plot = Plots(arguments=args, boolraw='true')
     plot = Plots(arguments=args, boolraw='true')
-    #view = 'raw'
-    #view = 'fft_spectra'
+    # view = 'raw'
+    # view = 'fft_spectra'
     view = 'Fourier_spectra'
-    ##plot.run(view).show()
-    #fig = plot.run(view).show()
+    # plot.run(view).show()
+    # fig = plot.run(view).show()
     fig = plot.run(view)
     print("type fig", type(fig))
-    #plt.show()
+    # plt.show()
