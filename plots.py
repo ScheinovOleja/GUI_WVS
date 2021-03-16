@@ -1,13 +1,14 @@
 #
 # for help: plots.py [-h] 
 #
-
+import asyncio
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from scipy import signal
 import argparse
 import os
+import time
 
 
 # parser = argparse.ArgumentParser()
@@ -72,8 +73,8 @@ class Plots:
                 if "Ending frequency:" in line:
                     self.end_freq = float(line.split(':')[1].split(' ')[1])
                 if "Data:" in line:
-                    print(c)
-                    print('now load the data')
+                    # print(c)
+                    # print('now load the data')
                     break
                 c += 1
         self.data = np.loadtxt(self.file_name, skiprows=c)
@@ -102,8 +103,8 @@ class Plots:
             if "TS:" in line:
                 self.ts = float(line.split(':')[1].split(' ')[1])
             if "Data:" in line:
-                print(c)
-                print('now load the data')
+                # print(c)
+                # print('now load the data')
                 break
             c += 1
         self.data = np.loadtxt(self.file_name, skiprows=c)
@@ -168,8 +169,8 @@ class Plots:
                 peaks = axis_spectrum[ind][np.argsort(axis_spectrum[ind, 1])][-label_peaks:]
                 ax[i].plot(peaks[:, 0], peaks[:, 1], 'k.', markersize=1)
 
-                print(self.labels[i])
-                print(peaks[::-1])
+                # print(self.labels[i])
+                # print(peaks[::-1])
 
         ax[1].set_ylabel('Ampl, $m/s^2$')
         ax[2].set_xlabel('Freq, Hz')
@@ -297,7 +298,7 @@ class Plots:
             fig = self.plot_accel_raw(raw, subtitle=self.args.name)
             return fig
         elif view == 'fft_spectra':
-            print("имя файла ", self.file_name)
+            # print("имя файла ", self.file_name)
             fft_embed = self.parse_accel_fft()
             fig = self.plot_fft_xyz(fft_embed['spectrum_x'],  # plot spectra
                                     fft_embed['spectrum_y'],
@@ -306,26 +307,26 @@ class Plots:
                                     f_min=self.args.fmin, f_max=self.args.fmax, )
             return fig
         elif view == 'Fourier_spectra':
-            print("имя файла ", self.file_name)
+            # print("имя файла ", self.file_name)
             # calculate Fourier spectra
             spectrum_x = self.calculate_fft(raw['data'][:, 0], raw['frequency'], remove_dc=False,
                                             norm_amplitude=True,
                                             window='hann',
                                             decim_factor=1)
-            print(spectrum_x)
+            # print(spectrum_x)
             spectrum_y = self.calculate_fft(raw['data'][:, 1], raw['frequency'], remove_dc=False,
                                             norm_amplitude=True,
                                             window='hann',
                                             decim_factor=1)
-            print(spectrum_y)
+            # print(spectrum_y)
             spectrum_z = self.calculate_fft(raw['data'][:, 2], raw['frequency'], remove_dc=False,
                                             norm_amplitude=True,
                                             window='hann',
                                             decim_factor=1)
-            print(spectrum_z)
+            # print(spectrum_z)
 
             # plot calculated Fourier spectra
-            print('Calculated spectra peaks:')
+            # print('Calculated spectra peaks:')
             fig = self.plot_fft_xyz(spectrum_x,
                                     spectrum_y,
                                     spectrum_z,
@@ -354,6 +355,8 @@ if __name__ == "__main__":
     view = 'Fourier_spectra'
     # plot.run(view).show()
     # fig = plot.run(view).show()
+    print(f"started at {time.strftime('%X')}")
     fig = plot.run(view)
-    print("type fig", type(fig))
-    # plt.show()
+    # print("type fig", type(fig))
+    plt.show()
+    print(f"finished at {time.strftime('%X')}")
