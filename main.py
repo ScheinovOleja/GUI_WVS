@@ -89,8 +89,8 @@ class MainWindow(QMainWindow):
         _translate = QCoreApplication.translate
         self.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.ui.checkBox.setText(_translate("MainWindow", "AutoUpdate"))
-        self.ui.label.setText(_translate("MainWindow", "Спектр сигнала"))
-        self.ui.label_2.setText(_translate("MainWindow", "Спектр огибающей"))
+        self.ui.label.setText(_translate("MainWindow", "Сырой сигнал"))
+        self.ui.label_2.setText(_translate("MainWindow", "Спектр (ограничен)"))
         self.ui.label_3.setText(_translate("MainWindow", "Полный спектр"))
         # self.ui.label_4.setText(_translate("MainWindow", "Батарея"))
         self.ui.label_5.setText(_translate("MainWindow", "Батарея:"))
@@ -128,8 +128,8 @@ class MainWindow(QMainWindow):
         file_raw, file_fft = self.get_file_type()
         print(f"started at {time.strftime('%X')}")
         self.ui.widget.plot(current_file=file_raw, option='raw')
-        self.ui.widget_2.plot(current_file=file_fft, option='fft_spectra')
-        self.ui.widget_3.plot(current_file=file_fft, option='Fourier_spectra')
+        self.ui.widget_2.plot(current_file=file_fft, option='fft_spectra_not_full')
+        self.ui.widget_3.plot(current_file=file_fft, option='fft_spectra_full')
         print(f"started at {time.strftime('%X')}")
 
 

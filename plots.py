@@ -9,6 +9,7 @@ from scipy import signal
 import argparse
 import os
 import time
+#from matplotlib.widgets import Cursor
 
 
 # parser = argparse.ArgumentParser()
@@ -143,9 +144,11 @@ class Plots:
 
     def plot_fft_xyz(self, x, y, z, label='', label_peaks=10,
                      y_min=None, y_max=None,
-                     f_min=None, f_max=None):
+                     f_min=None, f_max=None, i_st=1):
         i_start = 0
-        i_stop = x[:, 0].size
+        #i_stop = x[:, 0].size
+        i_stop = round((x[:, 0].size)/i_st)
+
         if f_min:
             i_start = np.squeeze(np.where(x[:, 0] < f_min))[-1]
         if f_max:
@@ -160,15 +163,17 @@ class Plots:
         f, ax = plt.subplots(3, 1, figsize=(10, 6), sharex='all', sharey='all')
 
         for i, axis_spectrum in enumerate([x, y, z]):
+
             ax[i].plot(axis_spectrum[:, 0], axis_spectrum[:, 1],
                        c=self.colors[i], lw=1, label=self.labels[i])
+            #cursor = Cursor(ax[i], horizOn=True, vertOn=True, color='red', linewidth=2.0)
 
             if label_peaks > 0:
                 ind, ampl = signal.find_peaks(axis_spectrum[:, 1],
                                               distance=2)
                 peaks = axis_spectrum[ind][np.argsort(axis_spectrum[ind, 1])][-label_peaks:]
                 ax[i].plot(peaks[:, 0], peaks[:, 1], 'k.', markersize=1)
-
+                #cursor = Cursor(ax[i], horizOn=True, vertOn=True, color='green', linewidth=2.0)
                 # print(self.labels[i])
                 # print(peaks[::-1])
 
@@ -194,11 +199,12 @@ class Plots:
         if y_min is None:
             y_min = np.min([np.median(x[:, 1]), np.median(y[:, 1]), np.median(z[:, 1])])
             y_min *= 0.01
-        # plt.ylim([Ymin, Ymax])
+        #plt.ylim([Ymin, Ymax])
 
         # ax[0].set_title('Fourier spectra for 3 axes\n' + label)
         plt.tight_layout()
         plt.subplots_adjust(hspace=0)
+        #plt.show()
 
         # if self.save_fig:
         return f
@@ -277,6 +283,7 @@ class Plots:
 
         plt.subplots_adjust(wspace=0.0, hspace=0.05)
 
+
         # if self.save_fig:
         #    plt.savefig(f'{subtitle}-waveform.png', dpi=300)
 
@@ -297,7 +304,7 @@ class Plots:
         if view == 'raw':
             fig = self.plot_accel_raw(raw, subtitle=self.args.name)
             return fig
-        elif view == 'fft_spectra':
+        elif view == 'fft_spectra_full':
             # print("имя файла ", self.file_name)
             fft_embed = self.parse_accel_fft()
             fig = self.plot_fft_xyz(fft_embed['spectrum_x'],  # plot spectra
@@ -306,33 +313,42 @@ class Plots:
                                     label=f'{self.args.name}-embed',
                                     f_min=self.args.fmin, f_max=self.args.fmax, )
             return fig
-        elif view == 'Fourier_spectra':
+        elif view == 'fft_spectra_not_full':
+            # print("имя файла ", self.file_name)
+            fft_embed = self.parse_accel_fft()
+            fig = self.plot_fft_xyz(fft_embed['spectrum_x'],  # plot spectra
+                                    fft_embed['spectrum_y'],
+                                    fft_embed['spectrum_z'],
+                                    label=f'{self.args.name}-embed',
+                                    f_min=self.args.fmin, f_max=self.args.fmax, i_st=6)
+            return fig
+        # elif view == 'Fourier_spectra':
             # print("имя файла ", self.file_name)
             # calculate Fourier spectra
-            spectrum_x = self.calculate_fft(raw['data'][:, 0], raw['frequency'], remove_dc=False,
-                                            norm_amplitude=True,
-                                            window='hann',
-                                            decim_factor=1)
-            # print(spectrum_x)
-            spectrum_y = self.calculate_fft(raw['data'][:, 1], raw['frequency'], remove_dc=False,
-                                            norm_amplitude=True,
-                                            window='hann',
-                                            decim_factor=1)
+            # spectrum_x = self.calculate_fft(raw['data'][:, 0], raw['frequency'], remove_dc=False,
+            #                                 norm_amplitude=True,
+            #                                 window='hann',
+            #                                 decim_factor=1)
+            # # print(spectrum_x)
+            # spectrum_y = self.calculate_fft(raw['data'][:, 1], raw['frequency'], remove_dc=False,
+            #                                 norm_amplitude=True,
+            #                                 window='hann',
+            #                                 decim_factor=1)
             # print(spectrum_y)
-            spectrum_z = self.calculate_fft(raw['data'][:, 2], raw['frequency'], remove_dc=False,
-                                            norm_amplitude=True,
-                                            window='hann',
-                                            decim_factor=1)
-            # print(spectrum_z)
+            # spectrum_z = self.calculate_fft(raw['data'][:, 2], raw['frequency'], remove_dc=False,
+            #                                 norm_amplitude=True,
+            #                                 window='hann',
+            #                                 decim_factor=1)
+            # # print(spectrum_z)
 
             # plot calculated Fourier spectra
             # print('Calculated spectra peaks:')
-            fig = self.plot_fft_xyz(spectrum_x,
-                                    spectrum_y,
-                                    spectrum_z,
-                                    label=f'{self.args.name}-calculated',
-                                    f_min=self.args.fmin, f_max=self.args.fmax, )
-            return fig
+            #fig = self.plot_fft_xyz(spectrum_x,
+            #                        spectrum_y,
+            #                        spectrum_z,
+            #                        label=f'{self.args.name}-calculated',
+            #                        f_min=self.args.fmin, f_max=self.args.fmax, )
+            #return fig
         # if self.args.print:
         # plt.show()
         # return plt
