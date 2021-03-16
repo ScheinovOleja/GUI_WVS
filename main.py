@@ -9,6 +9,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar  # Панель управления
 from design import Ui_MainWindow
 from plots import Plots
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class PlotWidget(QWidget):
@@ -38,6 +39,7 @@ class PlotWidget(QWidget):
             self.main_layout.addWidget(self.canvas)
             self.main_layout.addWidget(self.nav_tool_bar)
         self.canvas.draw()
+        self.canvas.setCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
         self.count += 1
 
 
