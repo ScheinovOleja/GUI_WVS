@@ -9,7 +9,7 @@ from scipy import signal
 import argparse
 import os
 import time
-#from matplotlib.widgets import Cursor
+from matplotlib.widgets import Cursor
 
 
 # parser = argparse.ArgumentParser()
@@ -56,6 +56,7 @@ class Plots:
         self.save_fig = arguments.savefig
         self.show_fig = arguments.print
         self.y_scale = str
+        #self.cursor = None
 
     def parse_accel_fft(self):
         c = 1
@@ -166,14 +167,13 @@ class Plots:
 
             ax[i].plot(axis_spectrum[:, 0], axis_spectrum[:, 1],
                        c=self.colors[i], lw=1, label=self.labels[i])
-            #cursor = Cursor(ax[i], horizOn=True, vertOn=True, color='red', linewidth=2.0)
-
+            #self.cursor = Cursor(ax[i], horizOn=True, vertOn=True, color='red', linewidth=2.0)
             if label_peaks > 0:
                 ind, ampl = signal.find_peaks(axis_spectrum[:, 1],
                                               distance=2)
                 peaks = axis_spectrum[ind][np.argsort(axis_spectrum[ind, 1])][-label_peaks:]
                 ax[i].plot(peaks[:, 0], peaks[:, 1], 'k.', markersize=1)
-                #cursor = Cursor(ax[i], horizOn=True, vertOn=True, color='green', linewidth=2.0)
+                #self.cursor = Cursor(ax[i], horizOn=True, vertOn=True, color='green', linewidth=2.0)
                 # print(self.labels[i])
                 # print(peaks[::-1])
 

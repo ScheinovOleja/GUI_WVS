@@ -10,8 +10,8 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 from design import Ui_MainWindow
 from plots import Plots
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-
+from threading import Thread
+#from matplotlib.widgets import Cursor
 class PlotWidget(QWidget):
     functions = {
         1: np.sin,
@@ -35,13 +35,21 @@ class PlotWidget(QWidget):
         self.figure = self.plots.run(option)
         self.canvas = FigureCanvas(self.figure)
         self.nav_tool_bar = NavigationToolbar(self.canvas, self)
+        # if self.count == 0:
+        #     self.main_layout.addWidget(self.canvas)
+        #     self.main_layout.addWidget(self.nav_tool_bar)
+        # self.canvas.draw()
+        #self.canvas.setCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
+        #self.canvas.cursor = self.plots.cursor
+        #self.cursor = Cursor(self.plots.a, horizOn=True, vertOn=True, color='green', linewidth=2.0)
+        # self.count += 1
+
+    def draw(self):
         if self.count == 0:
             self.main_layout.addWidget(self.canvas)
             self.main_layout.addWidget(self.nav_tool_bar)
         self.canvas.draw()
-        self.canvas.setCursor(QtGui.QCursor(QtCore.Qt.CrossCursor))
         self.count += 1
-
 
 class MainWindow(QMainWindow):
 
@@ -109,7 +117,26 @@ class MainWindow(QMainWindow):
                 self.ui.comboBox.addItem(item)
 
     def connect_ui(self):
-        self.ui.Update.clicked.connect(self.button_clicked)
+        ui1 = Thread(target=self.connect_ui1, args=())
+        ui2 = Thread(target=self.connect_ui2, args=())
+        ui3 = Thread(target=self.connect_ui3, args=())
+
+        ui1.start()
+        ui2.start()
+        ui3.start()
+
+        ui1.join()
+        ui2.join()
+        ui3.join()
+
+        #self.ui.Update.clicked.connect(self.button_clicked)
+
+    def connect_ui1(self):
+        self.ui.Update.clicked.connect(self.button_clicked1)
+    def connect_ui2(self):
+        self.ui.Update.clicked.connect(self.button_clicked2)
+    def connect_ui3(self):
+        self.ui.Update.clicked.connect(self.button_clicked3)
 
     def get_file_type(self):
         self.current_date = self.ui.comboBox.currentText().split('-a')[0]
@@ -126,13 +153,40 @@ class MainWindow(QMainWindow):
                     continue
         return file_raw, file_fft
 
-    def button_clicked(self):
+    # def button_clicked(self):
+    #     file_raw, file_fft = self.get_file_type()
+    #     print(f"started at {time.strftime('%X')}")
+    #     self.ui.widget.plot(current_file=file_raw, option='raw')
+    #     sh = Thread(target=self.ui.widget.draw, args=())
+    #     sh.start()
+    #     sh.join()
+    #     self.ui.widget_2.plot(current_file=file_fft, option='fft_spectra_not_full')
+    #     sh2 = Thread(target=self.ui.widget_2.draw, args=())
+    #     sh2.start()
+    #     sh2.join()
+    #     self.ui.widget_3.plot(current_file=file_fft, option='fft_spectra_full')
+    #     sh3 = Thread(target=self.ui.widget_3.draw, args=())
+    #     sh3.start()
+    #     sh3.join()
+    #     print(f"started at 2 {time.strftime('%X')}")
+
+    def button_clicked1(self):
         file_raw, file_fft = self.get_file_type()
         print(f"started at {time.strftime('%X')}")
         self.ui.widget.plot(current_file=file_raw, option='raw')
+        self.ui.widget.draw()
+
+    def button_clicked2(self):
+        file_raw, file_fft = self.get_file_type()
         self.ui.widget_2.plot(current_file=file_fft, option='fft_spectra_not_full')
+        self.ui.widget_2.draw()
+
+    def button_clicked3(self):
+        file_raw, file_fft = self.get_file_type()
         self.ui.widget_3.plot(current_file=file_fft, option='fft_spectra_full')
-        print(f"started at {time.strftime('%X')}")
+        self.ui.widget_3.draw()
+        print(f"started at 2 {time.strftime('%X')}")
+
 
 
 if __name__ == '__main__':
