@@ -128,3 +128,4 @@ dmypy.json
 .pyre/
 .idea/
 venv_gui_wvs/
+*.ui
